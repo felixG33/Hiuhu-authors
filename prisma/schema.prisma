@@ -1,0 +1,343 @@
+// Prisma Schema for HIUHU Literary Publishing & CMS Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  EDITOR
+  AUTHOR
+  READER
+}
+
+enum ContentType {
+  ARTICLE
+  POEM
+  STORY
+}
+
+enum ContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+model User {
+  id                   String          @id @default(cuid())
+  email                String          @unique
+  name                 String
+  passwordHash         String
+  role                 Role            @default(READER)
+  emailVerified        DateTime?
+  verificationToken    String?
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  avatar               String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  authorProfile        AuthorProfile?
+  comments             Comment[]
+  bookmarks            Bookmark[]
+  auditLogs            AuditLog[]
+  sessions             Session[]
+  notifications        Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
+
+model AuthorProfile {
+  id          String        @id @default(cuid())
+  userId      String        @unique
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String        @unique
+  photo       String?
+  bio         String?
+  location    String?
+  website     String?
+  twitter     String?
+  instagram   String?
+  linkedin    String?
+  goodreads   String?
+  genres      String?       // Comma-separated or tag list
+  isFeatured  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  contentItems ContentItem[]
+  books        Book[]
+
+  @@index([slug])
+  @@index([isFeatured])
+}
+
+model ContentItem {
+  id                 String        @id @default(cuid())
+  title              String
+  slug               String        @unique
+  excerpt            String?
+  content            String        // Rich text or formatted prose/verse
+  coverImage         String?
+  type               ContentType   @default(ARTICLE)
+  status             ContentStatus @default(DRAFT)
+  publishedAt        DateTime?
+  scheduledFor       DateTime?
+  isFeatured         Boolean       @default(false)
+  viewsCount         Int           @default(0)
+  readingTimeMinutes Int           @default(3)
+  allowComments      Boolean       @default(true)
+  deletedAt          DateTime?     // Soft deletion
+
+  // SEO Fields
+  seoTitle           String?
+  seoDescription     String?
+  seoKeywords        String?
+  ogImage            String?
+
+  authorId           String
+  author             AuthorProfile @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  categoryId         String?
+  category           Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  tags               ContentTag[]
+  comments           Comment[]
+  bookmarks          Bookmark[]
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([type, status, publishedAt])
+  @@index([slug])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([isFeatured])
+}
+
+model Book {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  description     String
+  cover           String?
+  isbn            String?
+  publisher       String?
+  publicationDate DateTime?
+  genre           String?
+  pages           Int?
+  buyUrl          String?
+  readUrl         String?
+  isFeatured      Boolean       @default(false)
+  viewsCount      Int           @default(0)
+  deletedAt       DateTime?
+
+  authorId        String
+  author          AuthorProfile @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([isFeatured])
+}
+
+model Category {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  accentColor String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  contentItems ContentItem[]
+
+  @@index([slug])
+}
+
+model Tag {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  contents    ContentTag[]
+
+  @@index([slug])
+}
+
+model ContentTag {
+  contentId String
+  tagId     String
+  content   ContentItem @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag       Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, tagId])
+}
+
+model Media {
+  id               String   @id @default(cuid())
+  filename         String
+  originalName     String
+  mimeType         String
+  size             Int
+  url              String
+  storageKey       String?
+  alt              String?
+  caption          String?
+  uploadedByUserId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([mimeType])
+  @@index([createdAt])
+}
+
+model Comment {
+  id            String        @id @default(cuid())
+  content       String
+  status        CommentStatus @default(PENDING)
+  authorName    String?
+  authorEmail   String?
+
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  contentItemId String
+  contentItem   ContentItem   @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([contentItemId, status])
+  @@index([status])
+}
+
+model Bookmark {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentItemId String
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, contentItemId])
+}
+
+model Page {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  content        String
+  published      Boolean  @default(true)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model NavigationItem {
+  id          String   @id @default(cuid())
+  label       String
+  path        String
+  location    String   @default("HEADER") // HEADER, FOOTER
+  order       Int      @default(0)
+  isEnabled   Boolean  @default(true)
+  openInNewTab Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([location, isEnabled, order])
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   // String or JSON stringified
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail String?
+  action    String   // LOGIN, LOGOUT, CREATE, UPDATE, DELETE, PUBLISH, UNPUBLISH, ROLE_CHANGE, SETTINGS_CHANGE
+  entity    String   // ContentItem, Book, AuthorProfile, User, SiteSetting, NavigationItem, Comment
+  entityId  String?
+  metadata  String?  // JSON string
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
