@@ -5,6 +5,7 @@ import { authorProfileSchema } from "@/lib/validations/author";
 import { generateUniqueAuthorSlug } from "@/lib/slug";
 import { logAuditEvent } from "@/lib/audit";
 import { Role } from "@prisma/client";
+import { string } from "zod/v4";
 
 export async function GET(req: NextRequest) {
   try {
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Automatically elevate user to AUTHOR role if not already SUPER_ADMIN
-    if (user.role === Role.READER && targetUserId === user.id) {
+    if ((user.role as any) === Role.READER && string(targetUserId) === string(user.id)) {
       await db.user.update({
         where: { id: user.id },
         data: { role: Role.AUTHOR },
