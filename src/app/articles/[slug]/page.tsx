@@ -32,20 +32,12 @@ export default async function Articlepage({
     }
     return(
         <main className="article-detail">
-            <link href="/articles"
-            className="back-link">
-                back to articles
-            </link>
-            <article className="article-content">
-                <p
-                className="article-date">{article.date}</p>
-                <h1>{article.title}</h1>
-                <div className="article-body">
-                    {article.content.split("\n\n").map((paragraph,index) =>(
-                        <p key={index}>{paragraph}</p>
-                    ))}
-                </div>
-            </article>
+        <h1>{article.title}</h1>
+        <p><em>{article.date}</em></p>
+        <div>{article.content}</div>
+        <br />
+        <link href="/articles">Back to articles</link>
         </main>
     );
 }
+            
