@@ -1,6 +1,6 @@
 import Link from "next/link";
 interface ArticlepageProps  { 
-    params: Promise<{ slug: string}>;
+    params: { slug: string};
 };
 const articles = [
     {
@@ -16,10 +16,10 @@ const articles = [
     content: "A story should entertain the writer too, Never underestimate the impact of a story well told."
 },
 ];
-export default async function Articlepage({
+export default function Articlepage({
     params,
 }: ArticlepageProps) {
-    const { slug } =await params;
+    const { slug } = params;
     const article = articles.find((a) => a.slug === slug);
     if(!article){
         return (
