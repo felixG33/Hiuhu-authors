@@ -1,4 +1,4 @@
-import link from "next/link"
+import link from "next/link";
 type articlepageprops = { 
     params: Promise<{ slug: string}>;
 };
