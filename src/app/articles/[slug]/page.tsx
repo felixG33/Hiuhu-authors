@@ -10,7 +10,7 @@ const articles = [
         content: "welcome to Hiuhu Authors This is a space for stories, ideas, reflections and meaningful conversations."
     },
  {
-    slug: "the=power-of-words",
+    slug: "the-power-of-words",
     title: "The-power-of-words",
     date: "october 10, 2026",
     content: "A story should entertain the writer too, Never underestimate the impact of a story well told."
