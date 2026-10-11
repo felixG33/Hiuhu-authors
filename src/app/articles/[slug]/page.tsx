@@ -1,5 +1,5 @@
 import Link from "next/link";
-type articlepageProps = { 
+interface ArticlepageProps  { 
     params: Promise<{ slug: string}>;
 };
 const articles = [
@@ -18,9 +18,9 @@ const articles = [
 ];
 export default async function Articlepage({
     params,
-}: articlepageProps) {
+}: ArticlepageProps) {
     const { slug } =await params;
-    const article = articles.find((article) => article.slug === slug);
+    const article = articles.find((a) => a.slug === slug);
     if(!article){
         return (
             <main className="article-detail">
