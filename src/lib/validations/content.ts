@@ -24,4 +24,5 @@ export const contentItemSchema = z.object({
   ogImage: z.string().optional().nullable(),
 });
 
+export const contentSchema = contentItemSchema;
 export type ContentItemInput = z.infer<typeof contentItemSchema>;

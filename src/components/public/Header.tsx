@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Bookmark, User, Menu, X, Feather } from "lucide-react";
+import { Search, Bookmark, Menu, X, Feather } from "lucide-react";
 import { Logo } from "@/components/branding/Logo";
 import { Button } from "@/components/ui/Button";
 
@@ -20,10 +20,9 @@ export function Header({ user }: HeaderProps) {
   const pathname = usePathname();
 
   const navLinks = [
-    { label: "Authors", href: "/authors" },
     { label: "Books", href: "/books" },
-    { label: "Articles", href: "/articles" },
-    { label: "Poems", href: "/poems" },
+    { label: "Poetry", href: "/poems" },
+    { label: "Essays", href: "/articles" },
     { label: "Stories", href: "/stories" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
@@ -69,7 +68,7 @@ export function Header({ user }: HeaderProps) {
           <Link
             href="/search"
             className="p-2 text-ink-700 dark:text-parchment-300 hover:text-ink-950 dark:hover:text-white transition-colors"
-            aria-label="Global Search"
+            aria-label="Search Works"
           >
             <Search className="h-4 w-4" />
           </Link>
@@ -88,7 +87,7 @@ export function Header({ user }: HeaderProps) {
                 <Link href="/admin">
                   <Button size="sm" variant="gold" className="text-xs gap-1.5 hidden sm:inline-flex">
                     <Feather className="h-3.5 w-3.5" />
-                    <span>CMS Studio</span>
+                    <span>Author Studio</span>
                   </Button>
                 </Link>
               )}
@@ -103,11 +102,6 @@ export function Header({ user }: HeaderProps) {
               <Link href="/login">
                 <Button variant="ghost" size="sm" className="text-xs uppercase tracking-wider">
                   Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button variant="default" size="sm" className="text-xs uppercase tracking-wider hidden sm:inline-flex">
-                  Join
                 </Button>
               </Link>
             </div>
@@ -135,7 +129,7 @@ export function Header({ user }: HeaderProps) {
               <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="gold" size="md" className="w-full gap-2">
                   <Feather className="h-4 w-4" />
-                  Enter CMS Studio
+                  Enter Author Studio
                 </Button>
               </Link>
             </div>

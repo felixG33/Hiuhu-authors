@@ -22,7 +22,7 @@ import {
   History,
   ExternalLink,
   ChevronRight,
-  BookMarked,
+  UserCheck,
 } from "lucide-react";
 import { Logo } from "@/components/branding/Logo";
 import { Role } from "@prisma/client";
@@ -42,51 +42,47 @@ export function AdminSidebar({ userRole = Role.SUPER_ADMIN, isOpen = false, onCl
 
   const navigationGroups = [
     {
-      title: "Core",
+      title: "Workspace",
       items: [
-        { label: "Overview", href: "/admin", icon: LayoutDashboard },
-        { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+        { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { label: "Readership Insights", href: "/admin/analytics", icon: BarChart3 },
       ],
     },
     {
-      title: "Publishing",
+      title: "Author Works",
       items: [
-        { label: "All Content", href: "/admin/content", icon: FileText },
-        { label: "Articles", href: "/admin/content?type=ARTICLE", icon: FileText },
-        { label: "Poems", href: "/admin/content?type=POEM", icon: Feather },
-        { label: "Stories", href: "/admin/content?type=STORY", icon: Bookmark },
-        { label: "Books", href: "/admin/books", icon: BookOpen },
-        { label: "Media Library", href: "/admin/media", icon: ImageIcon },
+        { label: "All Publications", href: "/admin/content", icon: FileText },
+        { label: "Articles & Essays", href: "/admin/content?type=ARTICLE", icon: FileText },
+        { label: "Poetry & Verse", href: "/admin/content?type=POEM", icon: Feather },
+        { label: "Short Stories", href: "/admin/content?type=STORY", icon: Bookmark },
+        { label: "Books & Editions", href: "/admin/books", icon: BookOpen },
+        { label: "Media Assets", href: "/admin/media", icon: ImageIcon },
       ],
     },
     {
-      title: "Community & Authors",
+      title: "Author Profile & Discourse",
       items: [
-        { label: "Authors", href: "/admin/authors", icon: BookMarked },
-        ...(isEditor ? [{ label: "Comments", href: "/admin/comments", icon: MessageSquare }] : []),
-        ...(isSuperAdmin ? [{ label: "Users & Roles", href: "/admin/users", icon: Users }] : []),
+        { label: "Author Folio & Bio", href: "/admin/authors", icon: UserCheck },
+        ...(isEditor ? [{ label: "Reader Comments", href: "/admin/comments", icon: MessageSquare }] : []),
+        ...(isSuperAdmin ? [{ label: "Users & Readers", href: "/admin/users", icon: Users }] : []),
       ],
     },
-    ...(isEditor
-      ? [
-          {
-            title: "Taxonomy",
-            items: [
-              { label: "Categories", href: "/admin/categories", icon: Layers },
-              { label: "Tags", href: "/admin/tags", icon: Tag },
-            ],
-          },
-        ]
-      : []),
+    {
+      title: "Categories & Taxonomies",
+      items: [
+        { label: "Literary Categories", href: "/admin/categories", icon: Layers },
+        { label: "Faceted Tags", href: "/admin/tags", icon: Tag },
+      ],
+    },
     ...(isSuperAdmin
       ? [
           {
-            title: "Site & Platform",
+            title: "Site & Design",
             items: [
               { label: "Homepage CMS", href: "/admin/homepage", icon: Sparkles },
-              { label: "Navigation", href: "/admin/navigation", icon: Compass },
-              { label: "SEO Metadata", href: "/admin/seo", icon: Search },
-              { label: "Platform Settings", href: "/admin/settings", icon: Settings },
+              { label: "Navigation Menus", href: "/admin/navigation", icon: Compass },
+              { label: "Global SEO", href: "/admin/seo", icon: Search },
+              { label: "Site Settings", href: "/admin/settings", icon: Settings },
               { label: "Audit Logs", href: "/admin/audit-logs", icon: History },
             ],
           },
@@ -116,7 +112,7 @@ export function AdminSidebar({ userRole = Role.SUPER_ADMIN, isOpen = false, onCl
         <div className="h-16 px-6 border-b border-ink-800/80 flex items-center justify-between">
           <Logo variant="admin" size="sm" showTagline={false} href="/admin" />
           <span className="text-[10px] font-mono tracking-widest text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-xs border border-amber-800/40">
-            CMS
+            STUDIO
           </span>
         </div>
 
@@ -172,9 +168,9 @@ export function AdminSidebar({ userRole = Role.SUPER_ADMIN, isOpen = false, onCl
           >
             <span className="flex items-center gap-2">
               <ExternalLink className="h-3.5 w-3.5 text-amber-400" />
-              Visit HIUHU Site
+              Visit Author Folio
             </span>
-            <span className="text-[10px] font-mono text-ink-400">Public ↗</span>
+            <span className="text-[10px] font-mono text-ink-400">Live ↗</span>
           </Link>
         </div>
       </aside>

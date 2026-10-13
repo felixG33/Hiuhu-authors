@@ -1,197 +1,117 @@
-main{
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 24px;
-    color: white;
-}
-body {
-    background-image: url("/Felix.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-.articles-page {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 45 30% 98%;
+    --foreground: 220 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+
+    --primary: 220 30% 12%;
+    --primary-foreground: 45 30% 98%;
+
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 220 25% 15%;
+
+    --muted: 40 15% 90%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 25 60% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 40 18% 85%;
+    --input: 40 18% 85%;
+    --ring: 25 60% 45%;
+
+    --radius: 0.25rem;
+  }
+
+  .dark {
+    --background: 224 35% 8%;
+    --foreground: 45 20% 96%;
+
+    --card: 224 30% 11%;
+    --card-foreground: 45 20% 96%;
+
+    --popover: 224 30% 11%;
+    --popover-foreground: 45 20% 96%;
+
+    --primary: 45 30% 96%;
+    --primary-foreground: 224 35% 8%;
+
+    --secondary: 224 25% 16%;
+    --secondary-foreground: 45 20% 92%;
+
+    --muted: 224 20% 18%;
+    --muted-foreground: 220 15% 65%;
+
+    --accent: 25 65% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 224 20% 20%;
+    --input: 224 20% 20%;
+    --ring: 25 65% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-serif selection:bg-amber-800/20 selection:text-ink-950;
     min-height: 100vh;
-    padding:60px 8%;
-    color: #f8f4ec;
-    background: rgba(18, 25, 23, 0.8);
-    font-family: Georgia, 'Times New Roman',serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
 }
-/* Articles header */
-.articles-header {
-    max-width: 850px;
-    margin: 0 auto 50px ;
-    text-align: center;
+
+/* Custom Poetry & Editorial Typography */
+.poem-verse {
+  font-family: Georgia, "Newsreader", "Times New Roman", serif;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
 }
-.back-home {
-    display: inline-block;
-    margin-bottom: 30px;
-    color: #d8bd91;
-    text-decoration: none;
-font-family: Arial, sans-serif;
-    font-size: 20px;
-    transition: color 0.3s ease;
+
+.poem-verse p {
+  margin-bottom: 1.5rem;
 }
-.back-home:hover {
-    color: #ffffff;
+
+/* Prose Editorial Styling */
+.editorial-prose {
+  font-family: Georgia, "Newsreader", serif;
+  font-size: 1.125rem;
+  line-height: 1.85;
 }
-   .articles-label{
-color:#d8bd91;
-font-family: Arial, sans-serif;
-font-size: 12px;
-font-weight: bold;
-letter-spacing: 4px;
-text-transform: uppercase;
-   }
-.articles-header h1 {
-    font-size: clamp(36px, 5vw, 58px);
-    margin: 18px 0;
-    font-weight:normal;
-    line-height: 1.15;
+
+.editorial-prose p {
+  margin-bottom: 1.5rem;
 }
-.articles-intro {
-    max-width:600px;
-    margin:0 auto;
-    color:#d0d0c8;
-    font-size:17px;
-    line-height: 1.8;
+
+.editorial-prose h2 {
+  font-size: 1.875rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
 }
-/*articles layout*/
-.articles-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 25px;
-    max-width:1200px;
-    margin: 0 auto;
-}
-/*individual article card*/
-.article-card {
-    display: flex;
-    flex-direction: column;
-    padding: 30px 25px;
-    min-height: 240px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(216, 189, 145, 0.25);
-    border-radius: 8px;
-    transition: transform 0.3s ease,
-    background 0.3s ease;
-    border-color: 0.3s ease;
-}
-.article-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.10);
-    border-color: #d8bd91;
-}
-.article-category {
-    margin-bottom: 15px;
-    color: #d8bd91;
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-.article-card h2 {
-    margin:0 0 15px;
-    color:#fffaf0;
-font-weight:normal;
-    font-size: 25px;
-    line-height: 1.35;
-}
-.article-card p {
-    margin:0 0 25px;
-    color:#d0d0c8;
-    font-size: 15px;
-    line-height: 1.8;
-}
-.read-more {
-    display: inline-block;
-    align-self: flex-start;
-    margin-top: auto;
-    color: #e2c99e;
-    text-decoration: none;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    transition: color 0.3s ease;
-}
-.read-more:hover{
-    color:#ffffff
-}
-/*bottom section*/
-.articles-footer{
-    margin-top:65px;
-    padding-top:25px;
-    border-top:25px;
-    border-top: 1px solid rgba(216, 189, 145, 0.25);
-    color: #c5c5c5;
-    font-size:14px;
-    text-align: center;
-}
-/*Tablets*/
-@media(max-width:900px){
-.articles-list{
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-}
-}
-.articles-page{
-    padding:45px 5%;
-}
-/*phones*/
-@media (max-width: 600px){
-    .articles-page{
-        padding:35px 20px;
-    }
-    .articles-list{
-        grid-template-columns: 1fr;
-        gap:18px;
-    }
-.articles-header h1{
-    font-size:36px;
-}
-.articles-intro{
-    font-size:25px;
-}
-.article-card{
-    min-height:200px;
-}
-}
-.article-detail {
-    max-width: 850px;
-    margin: 60px auto;
-    padding: 40px;
-color: #f8f5ef;
-background: rgba(20, 25, 22, 0.82);
-border-radius: 16px;
-line-height: 1.9;
-}
-.back-link{
-    display: inline-block;
-    margin-bottom: 35px;
-    color: #d7b779;
-    text-decoration: none;
-}
-.back-link:hover{
-    text-decoration: underline;
-}
-.article-content h1 {
-font-size: clamp(2rem, 5vw, 3.2rem);
-line-height: 1.2;
-margin: 10px 0 25px
-}
-.article-date{
-    color: #d7b779;
-    font-size: 0.9rem;
-}
-.article-body p {
-margin-bottom: 22px;
-font-size: 1.05rem;
-}
-@media(max-width:600px){
-    .article-detail{
-        margin: 25px 15px;
-        padding: 24px;
-    }
+
+.editorial-prose blockquote {
+  border-left: 2px solid hsl(var(--accent));
+  padding-left: 1.5rem;
+  font-style: italic;
+  margin: 2rem 0;
+  color: hsl(var(--muted-foreground));
 }
