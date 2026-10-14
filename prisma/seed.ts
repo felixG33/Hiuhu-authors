@@ -30,6 +30,33 @@ async function main() {
 
   console.log(`✅ Author & Super Admin established: ${superAdmin.email} (${superAdmin.name})`);
 
+  // Also ensure hiuhu@hiuhu.org and superadmin@hiuhu.org exist
+  const authorPasswordHash = await bcrypt.hash("Author123!", 12);
+  const hiuhuUser = await prisma.user.upsert({
+    where: { email: "hiuhu@hiuhu.org" },
+    update: { name: "HIUHU", role: Role.SUPER_ADMIN },
+    create: {
+      name: "HIUHU",
+      email: "hiuhu@hiuhu.org",
+      passwordHash: authorPasswordHash,
+      role: Role.SUPER_ADMIN,
+      emailVerified: new Date(),
+    },
+  });
+
+  const superAdminPasswordHash = await bcrypt.hash("SuperAdmin123!", 12);
+  await prisma.user.upsert({
+    where: { email: "superadmin@hiuhu.org" },
+    update: { name: "HIUHU Administrator", role: Role.SUPER_ADMIN },
+    create: {
+      name: "HIUHU Administrator",
+      email: "superadmin@hiuhu.org",
+      passwordHash: superAdminPasswordHash,
+      role: Role.SUPER_ADMIN,
+      emailVerified: new Date(),
+    },
+  });
+
   // 2. Individual Author Profile for HIUHU
   const authorHIUHU = await prisma.authorProfile.upsert({
     where: { userId: superAdmin.id },

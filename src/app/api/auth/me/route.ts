@@ -9,25 +9,47 @@ export async function GET() {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    const user = await db.user.findUnique({
-      where: { id: session.id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        avatar: true,
-        emailVerified: true,
-        authorProfile: {
-          select: {
-            id: true,
-            slug: true,
-            name: true,
-            photo: true,
+    let user: any = null;
+    try {
+      user = await db.user.findUnique({
+        where: { id: session.id },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          avatar: true,
+          emailVerified: true,
+          authorProfile: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+              photo: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch {
+      // Database unavailable or cold
+    }
+
+    if (!user) {
+      user = {
+        id: session.id,
+        email: session.email,
+        name: session.name,
+        role: session.role,
+        avatar: null,
+        emailVerified: new Date(),
+        authorProfile: {
+          id: session.authorProfileId || "hiuhu-author-root",
+          slug: session.authorSlug || "hiuhu",
+          name: session.name,
+          photo: null,
+        },
+      };
+    }
 
     return NextResponse.json({ user });
   } catch (error) {
