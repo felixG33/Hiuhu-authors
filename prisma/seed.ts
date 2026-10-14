@@ -36,8 +36,8 @@ async function main() {
     update: {
       name: "HIUHU",
       slug: "hiuhu",
-      bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between London and Kyoto.",
-      location: "London & Kyoto",
+      bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between Nairobi kenya.",
+      location: "Nairobi kenya",
       website: "https://hiuhu.org",
       twitter: "@hiuhupress",
       instagram: "@hiuhu_press",
