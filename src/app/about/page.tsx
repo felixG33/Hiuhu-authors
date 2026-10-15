@@ -44,7 +44,7 @@ export default async function AboutPage() {
       id: "hiuhu-author-root",
       name: "HIUHU",
       slug: "hiuhu",
-      photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
+      photo: "/author.jpg",
       bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between Nairobi kenya.",
       location: "Nairobi kenya",
       website: "https://hiuhu.org",
