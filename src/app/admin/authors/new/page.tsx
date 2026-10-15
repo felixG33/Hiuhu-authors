@@ -21,6 +21,7 @@ export default function NewAuthorPage() {
   const [website, setWebsite] = useState("");
   const [twitter, setTwitter] = useState("");
   const [instagram, setInstagram] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [genres, setGenres] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
 
@@ -56,6 +57,7 @@ export default function NewAuthorPage() {
         website: website || null,
         twitter: twitter || null,
         instagram: instagram || null,
+        whatsapp: whatsapp || null,
         genres: genres || null,
         isFeatured,
       };
@@ -138,16 +140,16 @@ export default function NewAuthorPage() {
                 onChange={(e) => setWebsite(e.target.value)}
               />
               <Input
-                label="Twitter / X Handle"
-                placeholder="@author"
-                value={twitter}
-                onChange={(e) => setTwitter(e.target.value)}
-              />
-              <Input
                 label="Instagram"
-                placeholder="@author_lit"
+                placeholder="@hiuhu_isaac"
                 value={instagram}
                 onChange={(e) => setInstagram(e.target.value)}
+              />
+              <Input
+                label="WhatsApp"
+                placeholder="@arch_hiuhuisaac"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
               />
             </div>
           </div>

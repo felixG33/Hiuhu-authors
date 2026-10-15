@@ -99,8 +99,9 @@ export default async function HomePage() {
     bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between Nairobi kenya.",
     location: "Nairobi kenya",
     website: "https://hiuhu.org",
-    twitter: "@hiuhupress",
-    instagram: "@hiuhu_press",
+    twitter: null,
+    instagram: "@hiuhu_isaac",
+    whatsapp: "@arch_hiuhuisaac",
     genres: "Poetry, Literary Essays, Speculative Fiction, Poetics",
     _count: {
       books: featuredBooks.length || 3,

@@ -24,6 +24,7 @@ export default function EditAuthorPage() {
   const [website, setWebsite] = useState("");
   const [twitter, setTwitter] = useState("");
   const [instagram, setInstagram] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [genres, setGenres] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
 
@@ -47,6 +48,7 @@ export default function EditAuthorPage() {
           setWebsite(data.author.website || "");
           setTwitter(data.author.twitter || "");
           setInstagram(data.author.instagram || "");
+          setWhatsapp(data.author.whatsapp || "");
           setGenres(data.author.genres || "");
           setIsFeatured(data.author.isFeatured || false);
         } else {
@@ -84,6 +86,7 @@ export default function EditAuthorPage() {
         website: website || null,
         twitter: twitter || null,
         instagram: instagram || null,
+        whatsapp: whatsapp || null,
         genres: genres || null,
         isFeatured,
       };
@@ -174,16 +177,16 @@ export default function EditAuthorPage() {
                 onChange={(e) => setWebsite(e.target.value)}
               />
               <Input
-                label="Twitter / X Handle"
-                placeholder="@author"
-                value={twitter}
-                onChange={(e) => setTwitter(e.target.value)}
-              />
-              <Input
                 label="Instagram"
-                placeholder="@author_lit"
+                placeholder="@hiuhu_isaac"
                 value={instagram}
                 onChange={(e) => setInstagram(e.target.value)}
+              />
+              <Input
+                label="WhatsApp"
+                placeholder="@arch_hiuhuisaac"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
               />
             </div>
           </div>

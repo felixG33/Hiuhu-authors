@@ -9,6 +9,7 @@ export const authorProfileSchema = z.object({
   website: z.string().url("Must be a valid URL").optional().nullable().or(z.literal("")),
   twitter: z.string().max(50).optional().nullable(),
   instagram: z.string().max(50).optional().nullable(),
+  whatsapp: z.string().max(50).optional().nullable(),
   linkedin: z.string().max(100).optional().nullable(),
   goodreads: z.string().max(100).optional().nullable(),
   genres: z.string().max(200).optional().nullable(),

@@ -88,6 +88,7 @@ model AuthorProfile {
   website     String?
   twitter     String?
   instagram   String?
+  whatsapp    String?
   linkedin    String?
   goodreads   String?
   genres      String?       // Comma-separated or tag list

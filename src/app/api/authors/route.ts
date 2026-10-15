@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
         website: data.website,
         twitter: data.twitter,
         instagram: data.instagram,
+        whatsapp: data.whatsapp,
         linkedin: data.linkedin,
         goodreads: data.goodreads,
         genres: data.genres,

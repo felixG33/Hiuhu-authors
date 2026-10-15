@@ -96,6 +96,8 @@ describe("Zod Validation Schemas", () => {
         slug: "marcus-thorne",
         bio: "Poet laureate and essayist residing in Cambridge.",
         location: "Cambridge, UK",
+        instagram: "@hiuhu_isaac",
+        whatsapp: "@arch_hiuhuisaac",
         isFeatured: true,
       });
       expect(validAuthor.success).toBe(true);

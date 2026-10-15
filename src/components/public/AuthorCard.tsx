@@ -11,6 +11,8 @@ export interface AuthorCardData {
   bio?: string | null;
   location?: string | null;
   website?: string | null;
+  instagram?: string | null;
+  whatsapp?: string | null;
   genres?: string | null;
   isFeatured?: boolean;
   _count?: {

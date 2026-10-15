@@ -78,6 +78,7 @@ export function generateAuthorSchema(author: {
   photo?: string | null;
   slug: string;
   website?: string | null;
+  instagram?: string | null;
   location?: string | null;
 }) {
   return {
@@ -87,7 +88,10 @@ export function generateAuthorSchema(author: {
     description: author.bio || undefined,
     image: author.photo ? (author.photo.startsWith("http") ? author.photo : `${SITE_URL}${author.photo}`) : undefined,
     url: `${SITE_URL}/authors/${author.slug}`,
-    sameAs: [author.website].filter(Boolean),
+    sameAs: [
+      author.website,
+      author.instagram ? `https://instagram.com/${author.instagram.replace("@", "")}` : null,
+    ].filter(Boolean),
     address: author.location
       ? {
           "@type": "PostalAddress",
