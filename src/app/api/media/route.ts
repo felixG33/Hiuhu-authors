@@ -48,10 +48,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    let mimeType = file.type;
+    if (!mimeType || mimeType === "application/octet-stream") {
+      const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+      const mimeMap: Record<string, string> = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
+        ".avif": "image/avif",
+        ".pdf": "application/pdf",
+        ".epub": "application/epub+zip",
+      };
+      if (mimeMap[ext]) {
+        mimeType = mimeMap[ext];
+      }
+    }
+
     const validation = validateFile({
       name: file.name,
       size: file.size,
-      type: file.type,
+      type: mimeType,
     });
 
     if (!validation.valid) {
@@ -61,7 +80,7 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const upload = await uploadFile(buffer, file.name, file.type);
+    const upload = await uploadFile(buffer, file.name, mimeType);
 
     const mediaRecord = await db.media.create({
       data: {

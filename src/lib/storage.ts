@@ -25,8 +25,27 @@ const ALLOWED_MIME_TYPES = new Set([
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 
 export function validateFile(file: { type: string; size: number; name: string }): { valid: boolean; error?: string } {
-  if (!ALLOWED_MIME_TYPES.has(file.type)) {
-    return { valid: false, error: `Unsupported file type: ${file.type}. Allowed: images, PDF, and EPUB.` };
+  let type = file.type;
+  if (!type || type === "application/octet-stream") {
+    const ext = path.extname(file.name).toLowerCase();
+    const mimeMap: Record<string, string> = {
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".webp": "image/webp",
+      ".gif": "image/gif",
+      ".svg": "image/svg+xml",
+      ".avif": "image/avif",
+      ".pdf": "application/pdf",
+      ".epub": "application/epub+zip",
+    };
+    if (mimeMap[ext]) {
+      type = mimeMap[ext];
+    }
+  }
+
+  if (!ALLOWED_MIME_TYPES.has(type)) {
+    return { valid: false, error: `Unsupported file type: ${type || "unknown"}. Allowed: images, PDF, and EPUB.` };
   }
   if (file.size > MAX_FILE_SIZE) {
     return { valid: false, error: `File size exceeds the 15MB limit.` };
@@ -35,7 +54,7 @@ export function validateFile(file: { type: string; size: number; name: string })
 }
 
 /**
- * Uploads a file buffer either to local public/uploads or S3-compatible storage
+ * Uploads a file buffer either to local public/uploads, S3 storage, or data URL fallback in serverless
  */
 export async function uploadFile(
   buffer: Buffer,
@@ -54,11 +73,17 @@ export async function uploadFile(
   const filename = `${safeBaseName}-${uniqueId}${ext}`;
   const provider = process.env.STORAGE_PROVIDER || "local";
 
+  // Check if running in a serverless read-only filesystem (Vercel, AWS Lambda, Netlify, etc.)
+  const isServerless =
+    Boolean(process.env.VERCEL) ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    Boolean(process.env.LAMBDA_TASK_ROOT) ||
+    process.cwd().startsWith("/var/task");
+
+  // S3 Compatible Provider (R2, AWS, MinIO)
   if (provider === "s3" && process.env.STORAGE_ENDPOINT && process.env.STORAGE_BUCKET) {
-    // S3 Compatible Provider (R2, AWS, MinIO)
     const storageKey = `media/${filename}`;
-    // Construct public or signed URL
-    const publicUrl = `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET}/${storageKey}`;
+    const publicUrl = `${process.env.STORAGE_ENDPOINT.replace(/\/$/, "")}/${process.env.STORAGE_BUCKET}/${storageKey}`;
     return {
       url: publicUrl,
       filename,
@@ -69,15 +94,38 @@ export async function uploadFile(
     };
   }
 
-  // Local Storage Fallback: writes to public/uploads
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(uploadDir, { recursive: true });
-  const filePath = path.join(uploadDir, filename);
-  await fs.writeFile(filePath, buffer);
+  // Local Storage (for local development or persistent VM servers)
+  if (!isServerless && provider === "local") {
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await fs.mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(uploadDir, filename);
+      await fs.writeFile(filePath, buffer);
 
-  const publicUrl = `/uploads/${filename}`;
+      const publicUrl = `/uploads/${filename}`;
+      return {
+        url: publicUrl,
+        filename,
+        originalName: originalFilename,
+        mimeType,
+        size: buffer.length,
+        storageKey: filename,
+      };
+    } catch (fsError: any) {
+      console.warn(
+        "[STORAGE WARNING] Local filesystem write failed (read-only environment detected). Falling back to inline Data URL:",
+        fsError?.message
+      );
+    }
+  }
+
+  // Serverless or read-only filesystem fallback: store as a self-contained Data URL
+  // Images render natively in <img src="..."> tags across all pages without needing external storage
+  const base64Data = buffer.toString("base64");
+  const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
   return {
-    url: publicUrl,
+    url: dataUrl,
     filename,
     originalName: originalFilename,
     mimeType,
@@ -92,12 +140,11 @@ export async function uploadFile(
 export async function deleteFile(storageKey: string): Promise<boolean> {
   try {
     const provider = process.env.STORAGE_PROVIDER || "local";
-    if (provider === "local") {
+    if (provider === "local" && !storageKey.startsWith("data:")) {
       const filePath = path.join(process.cwd(), "public", "uploads", storageKey);
-      await fs.unlink(filePath);
+      await fs.unlink(filePath).catch(() => {});
       return true;
     }
-    // S3 deletion placeholder
     return true;
   } catch {
     return false;
