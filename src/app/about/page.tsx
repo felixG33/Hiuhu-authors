@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
@@ -21,20 +21,42 @@ export default async function AboutPage() {
   let author: any = null;
 
   try {
-    [user, author] = await Promise.all([
-      getCurrentUser(),
-      db.authorProfile.findFirst({
-        orderBy: { isFeatured: "desc" },
-        include: {
-          books: { where: { deletedAt: null }, orderBy: { publicationDate: "desc" } },
-          _count: {
-            select: { contentItems: true, books: true },
+    [user, author] = await withDbRetry(() =>
+      Promise.all([
+        getCurrentUser(),
+        db.authorProfile.findFirst({
+          orderBy: { isFeatured: "desc" },
+          include: {
+            books: { where: { deletedAt: null }, orderBy: { publicationDate: "desc" } },
+            _count: {
+              select: { contentItems: true, books: true },
+            },
           },
-        },
-      }),
-    ]);
+        }),
+      ])
+    );
   } catch (error) {
     console.error("Error fetching author in AboutPage:", error);
+  }
+
+  if (!author) {
+    author = {
+      id: "hiuhu-author-root",
+      name: "HIUHU",
+      slug: "hiuhu",
+      photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
+      bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between Nairobi kenya.",
+      location: "Nairobi kenya",
+      website: "https://hiuhu.org",
+      twitter: "@hiuhupress",
+      instagram: "@hiuhu_press",
+      genres: "Poetry, Literary Essays, Speculative Fiction, Poetics",
+      books: [],
+      _count: {
+        books: 3,
+        contentItems: 6,
+      },
+    };
   }
 
   const authorName = author?.name || "HIUHU";

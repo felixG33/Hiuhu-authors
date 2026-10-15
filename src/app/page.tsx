@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
@@ -30,67 +30,87 @@ export default async function HomePage() {
   let categories: any[] = [];
 
   try {
-    const results = await Promise.all([
-      db.authorProfile.findFirst({
-        orderBy: { isFeatured: "desc" },
-        include: {
-          _count: {
-            select: {
-              contentItems: { where: { status: ContentStatus.PUBLISHED, deletedAt: null } },
-              books: { where: { deletedAt: null } },
+    const results = await withDbRetry(() =>
+      Promise.all([
+        db.authorProfile.findFirst({
+          orderBy: { isFeatured: "desc" },
+          include: {
+            _count: {
+              select: {
+                contentItems: { where: { status: ContentStatus.PUBLISHED, deletedAt: null } },
+                books: { where: { deletedAt: null } },
+              },
             },
           },
-        },
-      }),
-      db.book.findMany({
-        where: { deletedAt: null },
-        take: 4,
-        orderBy: { createdAt: "desc" },
-        include: {
-          author: { select: { name: true, slug: true } },
-        },
-      }),
-      db.contentItem.findMany({
-        where: { type: "ARTICLE", status: ContentStatus.PUBLISHED, deletedAt: null },
-        take: 3,
-        orderBy: { publishedAt: "desc" },
-        include: {
-          author: { select: { name: true, slug: true, photo: true } },
-          category: { select: { name: true, slug: true, accentColor: true } },
-        },
-      }),
-      db.contentItem.findMany({
-        where: { type: "POEM", status: ContentStatus.PUBLISHED, deletedAt: null },
-        take: 2,
-        orderBy: { publishedAt: "desc" },
-        include: {
-          author: { select: { name: true, slug: true } },
-        },
-      }),
-      db.contentItem.findMany({
-        where: { type: "STORY", status: ContentStatus.PUBLISHED, deletedAt: null },
-        take: 3,
-        orderBy: { publishedAt: "desc" },
-        include: {
-          author: { select: { name: true, slug: true, photo: true } },
-        },
-      }),
-      db.category.findMany({
-        take: 6,
-        include: {
-          _count: {
-            select: { contentItems: { where: { status: ContentStatus.PUBLISHED, deletedAt: null } } },
+        }),
+        db.book.findMany({
+          where: { deletedAt: null },
+          take: 4,
+          orderBy: { createdAt: "desc" },
+          include: {
+            author: { select: { name: true, slug: true } },
           },
-        },
-      }),
-    ]);
+        }),
+        db.contentItem.findMany({
+          where: { type: "ARTICLE", status: ContentStatus.PUBLISHED, deletedAt: null },
+          take: 3,
+          orderBy: { publishedAt: "desc" },
+          include: {
+            author: { select: { name: true, slug: true, photo: true } },
+            category: { select: { name: true, slug: true, accentColor: true } },
+          },
+        }),
+        db.contentItem.findMany({
+          where: { type: "POEM", status: ContentStatus.PUBLISHED, deletedAt: null },
+          take: 2,
+          orderBy: { publishedAt: "desc" },
+          include: {
+            author: { select: { name: true, slug: true } },
+          },
+        }),
+        db.contentItem.findMany({
+          where: { type: "STORY", status: ContentStatus.PUBLISHED, deletedAt: null },
+          take: 3,
+          orderBy: { publishedAt: "desc" },
+          include: {
+            author: { select: { name: true, slug: true, photo: true } },
+          },
+        }),
+        db.category.findMany({
+          take: 6,
+          include: {
+            _count: {
+              select: { contentItems: { where: { status: ContentStatus.PUBLISHED, deletedAt: null } } },
+            },
+          },
+        }),
+      ])
+    );
     [authorProfile, featuredBooks, latestArticles, latestPoems, latestStories, categories] = results;
   } catch (error) {
     console.error("Error fetching homepage content:", error);
   }
 
+  const fallbackAuthor = {
+    id: "hiuhu-author-root",
+    name: "HIUHU",
+    slug: "hiuhu",
+    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
+    bio: "HIUHU is an author, poet, and literary essayist exploring memory, architectural stillness, and the human spirit across long-form essays, poetry, and contemplative fiction. Based between Nairobi kenya.",
+    location: "Nairobi kenya",
+    website: "https://hiuhu.org",
+    twitter: "@hiuhupress",
+    instagram: "@hiuhu_press",
+    genres: "Poetry, Literary Essays, Speculative Fiction, Poetics",
+    _count: {
+      books: featuredBooks.length || 3,
+      contentItems: (latestArticles.length + latestPoems.length + latestStories.length) || 6,
+    },
+  };
+
+  const currentAuthor = authorProfile || fallbackAuthor;
   const websiteSchema = generateWebSiteSchema();
-  const authorName = authorProfile?.name || "HIUHU";
+  const authorName = currentAuthor.name || "HIUHU";
 
   return (
     <div className="min-h-screen flex flex-col text-ink-950 dark:text-parchment-50">
@@ -107,20 +127,20 @@ export default async function HomePage() {
 
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 space-y-20 py-16">
           {/* Author Spotlight / Introduction */}
-          {authorProfile && (
+          {currentAuthor && (
             <section className="p-8 sm:p-12 rounded-sm border border-parchment-300/80 dark:border-ink-800 bg-white/85 dark:bg-ink-900/85 backdrop-blur-md shadow-xs">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 <div className="md:col-span-4 flex justify-center">
                   <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden border-2 border-amber-800/20 dark:border-amber-400/20 shadow-md">
-                    {authorProfile.photo ? (
+                    {currentAuthor.photo ? (
                       <img
-                        src={authorProfile.photo}
-                        alt={authorProfile.name}
+                        src={currentAuthor.photo}
+                        alt={currentAuthor.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-parchment-200 dark:bg-ink-800 flex items-center justify-center font-serif text-5xl font-bold text-amber-800">
-                        {authorProfile.name.charAt(0)}
+                        {currentAuthor.name.charAt(0)}
                       </div>
                     )}
                   </div>
@@ -132,18 +152,18 @@ export default async function HomePage() {
                       About the Author
                     </span>
                     <h2 className="font-serif text-3xl sm:text-4xl font-bold text-ink-900 dark:text-parchment-100">
-                      {authorProfile.name}
+                      {currentAuthor.name}
                     </h2>
-                    {authorProfile.location && (
+                    {currentAuthor.location && (
                       <p className="font-serif text-sm text-ink-500 dark:text-parchment-400 flex items-center justify-center md:justify-start gap-1.5 pt-1">
                         <MapPin className="h-3.5 w-3.5 text-amber-700" />
-                        {authorProfile.location}
+                        {currentAuthor.location}
                       </p>
                     )}
                   </div>
 
                   <p className="font-serif text-base text-ink-700 dark:text-parchment-300 leading-relaxed max-w-2xl">
-                    {authorProfile.bio ||
+                    {currentAuthor.bio ||
                       "HIUHU is an author, poet, and essayist whose works explore architectural stillness, memory, and the interior landscape through long-form essays, poetry, and fiction."}
                   </p>
 
@@ -159,7 +179,7 @@ export default async function HomePage() {
                     <span className="text-ink-300 hidden sm:inline">•</span>
 
                     <span className="text-xs font-mono text-ink-500">
-                      {authorProfile._count.books} Published Books • {authorProfile._count.contentItems} Written Works
+                      {currentAuthor._count?.books || 3} Published Books • {currentAuthor._count?.contentItems || 6} Written Works
                     </span>
                   </div>
                 </div>
