@@ -139,7 +139,7 @@ export default function ContactPage() {
                   <span>
                     HIUHU Press Publishing Sanctuary
                     <br />
-                    Edinburgh • New York • Paris
+                    Nairobi. Kenya.
                   </span>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function ContactPage() {
               <div className="p-6 rounded-sm border border-parchment-300 dark:border-ink-800 bg-white dark:bg-ink-900/40 space-y-3">
                 <h4 className="font-serif text-lg font-bold">Submissions Notice</h4>
                 <p className="font-serif text-xs text-ink-600 dark:text-parchment-400 leading-relaxed">
-                  We review manuscripts, poetry chapbooks, and long-form essays on a rolling basis. Authors may register on the platform for draft uploads.
+                  We review manuscripts, poetry chapbooks, and articles on a rolling basis. Authors may register on the platform for draft uploads.
                 </p>
               </div>
             </div>
